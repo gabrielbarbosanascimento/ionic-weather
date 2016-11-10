@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { Platform } from 'ionic-angular';
-
+import { enableProdMode } from '@angular/core';
 import { WeatherPage } from '../pages/weather/weather';
 
+enableProdMode();
 @Component({
   template: `<ion-nav [root]="rootPage"></ion-nav>`
 })
