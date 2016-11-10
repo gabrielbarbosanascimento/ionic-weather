@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      Favorite Places
+    </ion-title>
+    <ion-buttons start>
+      <button ion-button (click)="dismiss()">
+        <ion-icon name="close"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-list-header>
+      Favorites
+    </ion-list-header>
+    <ion-item class="item-icon-left item" style="cursor: pointer" (click)="searchFromFavorite(favorite)" *ngFor="let favorite of favorites">{{favorite}}</ion-item>
+  </ion-list>
+</ion-content>
