@@ -28,8 +28,8 @@
   </div>
   <div class="weather_container_city" *ngIf="weather_city">
     <span>{{condition}}</span>
-    <img [src]="image_current_condition" alt="">
-    <h3>{{desc}}</h3>
+    <img [src]="image_current_condition" [alt]="condition">
+    <h3>{{locale}}</h3>
     <button ion-button style="margin: 0 auto; display: block" (click)="favorite()" *ngIf="!city_is_favorite" icon-left><ion-icon name="add-circle"></ion-icon> Add to Favorites</button>
     <button ion-button style="margin: 1em auto 0 auto; display: block" (click)="favorite()" *ngIf="city_is_favorite" color="danger"
       clear icon-left><ion-icon name="remove-circle"></ion-icon> Remove from Favorites</button>

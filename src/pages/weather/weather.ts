@@ -32,7 +32,8 @@ import { SettingsModal } from '../settings/settings.modal';
 })
 export class WeatherPage implements OnInit {
   private weather_service: WeatherService;
-  private desc: string;
+
+  private locale: string;
   private weather_city: number;
   private weather_city_low: number;
   private weather_city_high: number;
@@ -40,7 +41,6 @@ export class WeatherPage implements OnInit {
   private city: string;
   private city_is_favorite: boolean;
 
-  private images: Array<string>;
   private image_current_condition: string;
 
   private favorites: Array<string>;
@@ -49,7 +49,6 @@ export class WeatherPage implements OnInit {
     this.city_is_favorite = false;
     this.weather_service = ws;
     this.city = "";
-    this.images = new Array();
   }
 
   ngOnInit() {
@@ -59,18 +58,22 @@ export class WeatherPage implements OnInit {
       this.search();
     });
 
+    /** When user changes the preference about the unit */
     this.events.subscribe('measure:changed', (userEventData) => {
       this.ws.setDegreesMeasure(userEventData[0]);
       this.search();
     });
   }
 
+  /** Makes a search, receiving the response from the WeatherService */
   search() {
     if (this.city.length > 0) {
       this.weather_service.getWeather(this.city)
         .subscribe(weather => {
           if (weather.query.results !== null) {
-            this.desc = weather.query.results.channel.location.city + ', ' + weather.query.results.channel.location.region + ', ' + weather.query.results.channel.location.country;
+            this.locale = weather.query.results.channel.location.city + ', '
+              + weather.query.results.channel.location.region + ', '
+              + weather.query.results.channel.location.country;
 
             if (this.weather_service.getDegreesMeasure() == "C") {
               this.weather_city = this.convertFtoC(weather.query.results.channel.item.condition.temp);
@@ -84,9 +87,9 @@ export class WeatherPage implements OnInit {
 
             this.condition = weather.query.results.channel.item.condition.text;
             this.image_current_condition = this.weather_service.getImageWeatherCondition(this.condition);
-            this.weather_service.isFavorite(this.desc) == true ? this.city_is_favorite = true : this.city_is_favorite = false;
+            this.weather_service.isFavorite(this.locale) == true ? this.city_is_favorite = true : this.city_is_favorite = false;
           } else {
-            this.desc = "";
+            this.locale = "";
             this.weather_city = undefined;
             this.weather_city_high = undefined;
             this.weather_city_low = undefined;
@@ -97,7 +100,8 @@ export class WeatherPage implements OnInit {
           }
         });
     } else {
-      this.desc = "";
+      //IF USER DID WRITE OR ERASED THE VALUE FROM THE SEARCH BAR INPUT
+      this.locale = "";
       this.weather_city = undefined;
       this.weather_city_high = undefined;
       this.weather_city_low = undefined;
@@ -108,31 +112,36 @@ export class WeatherPage implements OnInit {
     }
   }
 
+  /** Method called by an event when user clicks on a favorite from FavoritesModal */
   searchFromFavorite(cidade: string) {
     this.city = cidade;
     this.search();
   }
 
+  /** Favorite a city */
   favorite() {
     if (this.city_is_favorite) {
       this.city_is_favorite = false;
-      this.weather_service.removeFavorite(this.desc);
+      this.weather_service.removeFavorite(this.locale);
     } else {
       this.city_is_favorite = true;
-      this.weather_service.addFavorite(this.desc);
+      this.weather_service.addFavorite(this.locale);
     }
   }
 
+  /** Converts fahrenheit to celcius*/
   convertFtoC(temp: number): number {
     let x = (temp - 32) * 5 / 9;
     return Math.round(x);
   }
 
+  /** Transition to the favorites modal */
   goToFavorites() {
     let modal = this.modalCtrl.create(FavoritesModal);
     modal.present();
   }
 
+  /** Transition to the setting modal */
   goToSettings() {
     let modal = this.modalCtrl.create(SettingsModal);
     modal.present();

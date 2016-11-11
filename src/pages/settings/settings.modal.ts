@@ -10,12 +10,8 @@ import { WeatherService } from '../weather/weather.service';
 })
 export class SettingsModal {
     private degress_measure: string;
-    private celcius: string;
-    private fahrenheit: string;
 
     constructor(public viewCtrl: ViewController, public events: Events, public ws: WeatherService) {
-        this.celcius = "C";
-        this.fahrenheit = "F";
         this.degress_measure = ws.getDegreesMeasure();
     }
 
@@ -23,9 +19,12 @@ export class SettingsModal {
         this.viewCtrl.dismiss();
     }
 
+    /** Change the unit preference */
     click(radio: string) {
-        this.events.publish('measure:changed', radio);
-        this.degress_measure = radio;
+        if (this.degress_measure != radio) {
+            this.events.publish('measure:changed', radio);
+            this.degress_measure = radio;
+        }
         this.dismiss();
     }
 }
