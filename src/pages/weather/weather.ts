@@ -54,7 +54,7 @@ export class WeatherPage implements OnInit {
     this.weather_service = ws;
     this.city = "";
 
-    if (this.weather_service.hasCity) {
+    if (this.weather_service.hasCity()) {
       this.city = this.weather_service.getCity();
       this.search();
     } else {
