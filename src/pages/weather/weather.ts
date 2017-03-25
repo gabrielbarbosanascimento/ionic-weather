@@ -130,6 +130,7 @@ export class WeatherPage implements OnInit {
       this.weather_service.getWeather(this.city)
         .subscribe(weather => {
           if (weather.query.results !== null) {
+            this.weather_service.addCity(this.city);
             this.locale = weather.query.results.channel.location.city + ', '
               + weather.query.results.channel.location.region + ', '
               + weather.query.results.channel.location.country;
