@@ -9,7 +9,7 @@ import { WeatherService } from '../weather/weather.service';
     providers: [WeatherService]
 })
 export class SettingsModal {
-    private degress_measure: string;
+    public degress_measure: string;
 
     constructor(public viewCtrl: ViewController, public events: Events, public ws: WeatherService) {
         this.degress_measure = ws.getDegreesMeasure();

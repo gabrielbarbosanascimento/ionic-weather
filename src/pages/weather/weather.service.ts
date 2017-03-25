@@ -17,6 +17,7 @@ export class WeatherService {
             this.storage = {
                 degrees_measure: "C",
                 favorites: [],
+                city: ''
             };
             this.updateStorage();
         }
@@ -76,6 +77,20 @@ export class WeatherService {
             }
         }
         this.updateStorage();
+    }
+
+    /** Mark a place to be read later */
+    addCity(city: string): void {
+        this.storage.city = city;
+        this.updateStorage();
+    }
+
+    getCity(): string {
+        return this.storage.city;
+    }
+
+    hasCity(): boolean {
+        return this.storage.city == false;
     }
 
     /** Check if a place is favorite */

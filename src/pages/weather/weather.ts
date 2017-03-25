@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController, NavParams } from 'ionic-angular';
-import { Events } from 'ionic-angular';
+import { Http } from '@angular/http';
+import { ModalController, NavParams, Events } from 'ionic-angular';
 
 import { WeatherService } from './weather.service';
 import { FavoritesModal } from '../favorites/favorites.modal';
@@ -31,24 +31,37 @@ import { SettingsModal } from '../settings/settings.modal';
   providers: [WeatherService]
 })
 export class WeatherPage implements OnInit {
-  private weather_service: WeatherService;
+  public weather_service: WeatherService;
 
-  private locale: string;
-  private weather_city: number;
-  private weather_city_low: number;
-  private weather_city_high: number;
-  private condition: string;
-  private city: string;
-  private city_is_favorite: boolean;
+  public locale: string;
+  public weather_city: number;
+  public weather_city_low: number;
+  public weather_city_high: number;
+  public condition: string;
+  public city: string;
+  public city_is_favorite: boolean;
 
-  private image_current_condition: string;
+  public image_current_condition: string;
 
-  private favorites: Array<string>;
+  constructor(
+    public http: Http,
+    public modalCtrl: ModalController,
+    public navParams: NavParams,
+    public ws: WeatherService,
+    public events: Events) {
 
-  constructor(public modalCtrl: ModalController, public navParams: NavParams, public ws: WeatherService, public events: Events) {
     this.city_is_favorite = false;
     this.weather_service = ws;
     this.city = "";
+
+    if (this.weather_service.hasCity) {
+      this.city = this.weather_service.getCity();
+      this.search();
+    } else {
+      navigator.geolocation.getCurrentPosition((data) => {
+        this.getCityByCoords(data.coords.latitude, data.coords.longitude);
+      });
+    }
   }
 
   ngOnInit() {
@@ -63,6 +76,52 @@ export class WeatherPage implements OnInit {
       this.ws.setDegreesMeasure(userEventData[0]);
       this.search();
     });
+  }
+
+  getCityByCoords(lat, long) {
+    let found = [0, 0, 0];
+    let stop = false;
+    let cityName, stateName, countryName;
+    let ang = this;
+
+    this.http.get('http://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + long).map(res => res.json())
+      .subscribe(
+      (data) => {
+        data.results.map(function (obj) {
+          obj.address_components.map(function (adress) {
+            if (adress.types == "administrative_area_level_2,political") {
+              if (found[0] != 1) {
+                cityName = adress.long_name;
+                found[0] = 1;
+              }
+            }
+
+            if (adress.types == "administrative_area_level_1,political") {
+              if (found[1] != 1) {
+                stateName = adress.long_name;
+                found[1] = 1;
+              }
+            }
+
+            if (adress.types == "country,political") {
+              if (found[2] != 1) {
+                countryName = adress.long_name;
+                found[2] = 1;
+              }
+            }
+
+            if (found[0] != 0 && found[1] != 0 && found[2] != 0) {
+              if (!stop) {
+                ang.city = cityName + ', ' + stateName + ', ' + countryName;
+                ang.weather_service.addCity(ang.city);
+                ang.search();
+                stop = true;
+              }
+            }
+          });
+        });
+      }
+      );
   }
 
   /** Makes a search, receiving the response from the WeatherService */
