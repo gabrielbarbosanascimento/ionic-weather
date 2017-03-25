@@ -84,7 +84,7 @@ export class WeatherPage implements OnInit {
     let cityName, stateName, countryName;
     let ang = this;
 
-    this.http.get('http://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + long).map(res => res.json())
+    this.http.get('https://maps.googleapis.com/maps/api/geocode/json?latlng=' + lat + ',' + long).map(res => res.json())
       .subscribe(
       (data) => {
         data.results.map(function (obj) {
