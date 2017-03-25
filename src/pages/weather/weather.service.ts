@@ -90,7 +90,7 @@ export class WeatherService {
     }
 
     hasCity(): boolean {
-        return this.storage.city == false;
+        return this.storage.city != "";
     }
 
     /** Check if a place is favorite */
